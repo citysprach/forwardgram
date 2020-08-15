@@ -18,9 +18,10 @@ def start(config):
     input_channels_entities = []
     output_channel_entities = []
     for d in client.iter_dialogs():
-        if d.name in config["input_channel_names"]:
+        print(d.entity.id, d.name)
+        if d.entity.id in config["input_channel_names"]:
             input_channels_entities.append(InputChannel(d.entity.id, d.entity.access_hash))
-        if d.name in config["output_channel_names"]:
+        if d.entity.id in config["output_channel_names"]:
             output_channel_entities.append(InputChannel(d.entity.id, d.entity.access_hash))
             
     if not output_channel_entities:
@@ -36,7 +37,9 @@ def start(config):
     @client.on(events.NewMessage(chats=input_channels_entities))
     async def handler(event):
         for output_channel in output_channel_entities:
-            await client.forward_messages(output_channel, event.message)
+            await client.send_message(output_channel, '**FORWARDED:**')
+            await client.send_message(output_channel,event.message)
+            # await client.forward_messages(output_channel, event.message)
 
     client.run_until_disconnected()
 
